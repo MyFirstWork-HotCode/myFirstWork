@@ -3,6 +3,8 @@ package com.myfirstwork.myfirstwork;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,10 +27,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     EditText email;
     EditText password;
     Button signIn,signUp;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context=this;
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
         signIn=findViewById(R.id.sign_in);
@@ -64,8 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(task.isSuccessful()) {
                     Toast toast = Toast.makeText(getApplicationContext(), "Авторизация успешна", Toast.LENGTH_LONG);
                     toast.show();
+                    Intent intent = new Intent(context,LentaActivity.class);
+                    startActivity(intent);
                 }else{
-                    Toast toast = Toast.makeText(getApplicationContext(), "Авторизация успешна", Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Авторизация провалена", Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
