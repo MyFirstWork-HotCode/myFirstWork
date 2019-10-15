@@ -26,19 +26,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAnalytics mFirebaseAnalytics;
     EditText email;
     EditText password;
-    Button signIn,signUp;
+    Button signIn,signUp,go;
     private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context=this;
+        go=findViewById(R.id.go);
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
         signIn=findViewById(R.id.sign_in);
         signUp=findViewById(R.id.sign_up);
         signIn.setOnClickListener(this);
         signUp.setOnClickListener(this);
+        go.setOnClickListener(this);
         mAuth=FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -59,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             signIng(String.valueOf(email.getText()),String.valueOf(password.getText()));
         }else if (view.getId()==signUp.getId()){
             signUping(String.valueOf(email.getText()),String.valueOf(password.getText()));
+        }else {
+            Intent intent = new Intent(context,LentaActivity.class);
+            startActivity(intent);
         }
     }
     private void signIng(String login,String password){
