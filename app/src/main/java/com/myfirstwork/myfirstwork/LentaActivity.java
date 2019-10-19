@@ -1,5 +1,6 @@
 package com.myfirstwork.myfirstwork;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -37,7 +38,8 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     ImageButton imageButton;
     BottomNavigationView bottomNavigationView;
     ProgressBar progressBar;
-    String path="https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/-9-n46UUhn7_sA";
+    //String path = "https://radikal.ru/vf/tCjVkzcaCAW";
+    String path="https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/UcUt-b0Q7mWdtw";
     int height;
     Handler handler = new Handler();
     @Override
@@ -60,6 +62,11 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.camera:
+                        Intent intent = new Intent(LentaActivity.this,CameraActivity.class);
+                        startActivity(intent);
+                }
                 return false;
             }
         });
