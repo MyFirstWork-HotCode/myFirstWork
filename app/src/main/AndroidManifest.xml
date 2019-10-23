@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.STORAGE" />
     <uses-feature android:name="android.hardware.camera2.full"/>
     <application
         android:allowBackup="true"
@@ -29,6 +30,8 @@
         <activity android:name=".CameraActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"/>
+        <activity android:name=".PreviewActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout"
@@ -7,30 +7,34 @@
 
     <TextureView
         android:id="@+id/video"
-        android:layout_weight="20"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <RelativeLayout
-        android:layout_weight="1"
+        android:layout_gravity="bottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/black">
+        android:layout_height="wrap_content">
         <ImageButton
             android:id="@+id/rec"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
             android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/play"/>
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/record"/>
         <ImageButton
             android:id="@+id/stop"
+            android:background="@android:color/transparent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/pause"/>
         <ImageButton
             android:id="@+id/reverse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/replay"
             android:layout_alignParentRight="true"/>
     </RelativeLayout>
-</LinearLayout>
+</FrameLayout>

@@ -57,16 +57,16 @@
                 android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="200dp"/>
-            <ImageButton
-                android:clickable="false"
-                android:id="@+id/start_stop"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="200dp"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/play"
-                android:background="@android:color/transparent"/>
+<!--            <ImageButton-->
+<!--                android:clickable="false"-->
+<!--                android:id="@+id/start_stop"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:layout_marginTop="200dp"-->
+<!--                android:layout_width="100dp"-->
+<!--                android:layout_height="100dp"-->
+<!--                android:scaleType="fitXY"-->
+<!--                android:src="@drawable/play"-->
+<!--                android:background="@android:color/transparent"/>-->
             <ImageView
                 android:id="@+id/avatar_img"
                 android:layout_width="100dp"

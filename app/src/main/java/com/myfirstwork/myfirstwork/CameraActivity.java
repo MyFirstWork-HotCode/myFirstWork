@@ -3,8 +3,8 @@ package com.myfirstwork.myfirstwork;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -24,7 +24,6 @@ import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
@@ -37,12 +36,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Permission;
 import java.util.Arrays;
 
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String LOG_TAG = "myLogs";
-    private String[] permission = { Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO};
+    public static final String NAME_VIDEO = "video";
+    private String[] permission = { Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO,Manifest.permission.READ_EXTERNAL_STORAGE};
     String[] myCameras = null;
     CameraService [] cameraServices = null;
     private CameraManager mCameraManager = null;
@@ -53,8 +53,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private Handler handler;
     private MediaRecorder mediaRecorder;
     private File mCurrentFile;
-    private int count=1;
-
+    private int count=0;
+    private int [] ORIENTATION = null;
+    private boolean flagRecording=false;
+    private Context context;
     private void startBackgroundThread(){
         backgroundThread = new HandlerThread("CameraHandler");
         backgroundThread.start();
@@ -75,14 +77,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.camera_activity);
+        setContentView(R.layout.activity_camera);
         textureView=findViewById(R.id.video);
         selectCamera=findViewById(R.id.reverse);
         startRecording=findViewById(R.id.rec);
         stopRecording=findViewById(R.id.stop);
         selectCamera.setOnClickListener(this);
         startRecording.setOnClickListener(this);
-        stopRecording.setOnClickListener(this);
+        context=this;
         requestPermissions(permission,0);
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -120,14 +122,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private void startCameraActivity() {
         Log.i(LOG_TAG,"Start Camera");
         try {
-            createCameras();
+            getInfoCameras();
             setUpMediaRecorder();
+            createCameras();
             cameraServices[idCamera].openCamera();
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
     private void getInfoCameras() throws CameraAccessException {
+        ORIENTATION = new int[mCameraManager.getCameraIdList().length];
         for (String cameraID : mCameraManager.getCameraIdList()) {
             Log.i(LOG_TAG, "cameraID: " + cameraID);
             int id = Integer.parseInt(cameraID);
@@ -163,7 +167,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         for (String cameraID:mCameraManager.getCameraIdList()){
             Log.i(LOG_TAG, "cameraID: "+cameraID);
             int id = Integer.parseInt(cameraID);
-
+            CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraID);
+            int facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+            if(facing==CameraCharacteristics.LENS_FACING_FRONT){
+                ORIENTATION[id]=270;
+            }
+            else{
+                ORIENTATION[id]=90;
+            }
             // создаем обработчик для камеры
             cameraServices[id] = new CameraService(mCameraManager,cameraID);
         }
@@ -182,6 +193,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         super.onResume();
@@ -204,10 +216,26 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 nextCamera();
                 break;
             case R.id.rec:
-                mediaRecorder.start();
-                Toast.makeText(this, "start video", Toast.LENGTH_SHORT).show();
+                if(!flagRecording){
+                    selectCamera.setVisibility(View.INVISIBLE);
+                    mediaRecorder.start();
+                    startRecording.setImageResource(R.drawable.stop);
+                    flagRecording=!flagRecording;
+                    Toast.makeText(this, mCurrentFile.getPath(), Toast.LENGTH_SHORT).show();
+                }else {
+                    selectCamera.setVisibility(View.VISIBLE);
+                    startRecording.setImageResource(R.drawable.record);
+                    cameraServices[idCamera].stopRecordingVideo();
+                    flagRecording=!flagRecording;
+                    Intent intent = new Intent(CameraActivity.this,PreviewActivity.class);
+                    intent.putExtra("path",mCurrentFile.getAbsolutePath());
+                    startActivity(intent);
+                    finish();
+                    Toast.makeText(this, "stop recording", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.stop:
+                selectCamera.setVisibility(View.VISIBLE);
                 cameraServices[idCamera].stopRecordingVideo();
                 Toast.makeText(this, "stop recording", Toast.LENGTH_SHORT).show();
         }
@@ -234,11 +262,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mCurrentFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "test"+count+".mp4");
+        mCurrentFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), NAME_VIDEO+".mp4");
         mediaRecorder.setOutputFile(mCurrentFile.getAbsolutePath());
-        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
+        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
         mediaRecorder.setVideoFrameRate(profile.videoFrameRate);
         mediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+        mediaRecorder.setOrientationHint(ORIENTATION[idCamera]);
         mediaRecorder.setVideoEncodingBitRate(profile.videoBitRate);
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -303,6 +332,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onOpened(@NonNull CameraDevice camera) {
                 mCameraDevice=camera;
+
                 Log.i(LOG_TAG,"Open camera with id :"+ mCameraDevice.getId());
                 createCameraPreviewSession();
             }
@@ -367,4 +397,28 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
 
     }
+
+//    public class MergeVideo extends AsyncTask<String,Integer,String> {
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            ProgressDialog.show(context,"Ожидание","Склейка",true);
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... strings) {
+//            try {
+//                String paths[] = new String[count];
+//                Movie[] movies = new Movie[count];
+//                for(int i = 0 ; i< count; i++){
+//                    paths[i]= mCurrentFile.getPath()+NAME_VIDEO+i+".mp4";
+//                    movies[i]= Movie
+//                }
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//    }
 }
