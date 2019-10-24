@@ -19,8 +19,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -38,19 +40,23 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     VideoView videoView;
     Button bloger,finder,work;
     DisplayMetrics displayMetrics;
-   // ImageButton imageButton;
     BottomNavigationView bottomNavigationView;
     ProgressBar progressBar;
+    ImageView like,dislike;
+    TextView textLike,textDiss;
     ArrayList<String> pathVideos = new ArrayList<>();
     int height;
     Handler handler = new Handler();
     private GestureDetector gestureDetector;
+    Animation animation, videoAnimation;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lenta);
         displayMetrics = getResources().getDisplayMetrics();
         gestureDetector = new GestureDetector(this,new GestureListener());
+        animation = AnimationUtils.loadAnimation(this,R.anim.scale_like);
+        videoAnimation = AnimationUtils.loadAnimation(this,R.anim.video_animation);
         findIDResourse();
         setOnClickListener();
         makeListVideo();
@@ -69,12 +75,6 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         setButtonSelect(finder);
         videoView = findViewById(R.id.video);
         setVideoView(pathVideos);
-        //videoView.setOnClickListener(videoListener);
-        Log.d("HeightMenu", String.valueOf(finder.getHeight()));
-        Log.d("HeightMax", String.valueOf(displayMetrics.heightPixels));
-        Log.d("Height", String.valueOf(height));
-        Log.d("Width", String.valueOf(videoView.getWidth()));
-        //imageButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -95,6 +95,18 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                 setButtonNoSelect(finder);
                 setButtonNoSelect(bloger);
                 break;
+            case R.id.diss:
+                dislike.startAnimation(animation);
+                videoView.startAnimation(videoAnimation);
+                count++;
+                nextVideo();
+                break;
+            case R.id.like:
+                like.startAnimation(animation);
+                videoView.startAnimation(videoAnimation);
+                count++;
+                nextVideo();
+                break;
         }
     }
     private void setButtonSelect(View view){
@@ -107,17 +119,24 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     }
 
     private void makeListVideo(){     //create list https
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
+        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201417.mp4");
+        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201352.mp4");
+        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201410.mp4");
+        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201401.mp4");
     }
     private void findIDResourse(){    //find resourse
+        like=findViewById(R.id.like);
+        textDiss=findViewById(R.id.diss_text);
+        textLike=findViewById(R.id.like_text);
+        dislike=findViewById(R.id.diss);
         bloger=findViewById(R.id.bloger);
         finder=findViewById(R.id.finder);
         work=findViewById(R.id.work);
         progressBar=findViewById(R.id.progress_bar);
-        //imageButton=findViewById(R.id.start_stop);
         bottomNavigationView=findViewById(R.id.bottom_menu);
         bottomNavigationView.setSelectedItemId(R.id.lenta);
     }
@@ -125,22 +144,33 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         bloger.setOnClickListener(this);
         finder.setOnClickListener(this);
         work.setOnClickListener(this);
+        like.setOnClickListener(this);
+        dislike.setOnClickListener(this);
+        textLike.setOnClickListener(this);
+        textDiss.setOnClickListener(this);
     }
     @SuppressLint("ClickableViewAccessibility")
     private void setVideoView(final ArrayList<String> videoPath){
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(displayMetrics.heightPixels-(180*displayMetrics.scaledDensity)));
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         videoView.setLayoutParams(params);
-        videoView.setKeepScreenOn(true);
         videoView.setVideoURI(Uri.parse(videoPath.get(count)));
         videoView.requestFocus();
         videoView.seekTo(1);
-        videoView.start();
         videoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 gestureDetector.onTouchEvent(event);
-                setVideoView(videoPath);
+                if(event.getAction()==MotionEvent.ACTION_DOWN){
+                    if(videoView.isPlaying()) {
+                        videoView.pause();
+                        Toast.makeText(LentaActivity.this, "PAUSE VIDEO", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(videoView.canPause()) {
+                        videoView.start();
+                        Toast.makeText(LentaActivity.this, "PLAY VIDEO", Toast.LENGTH_SHORT).show();
+                    }
+                }
                 return false;
             }
         });
@@ -148,35 +178,32 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         progressBar.setVisibility(View.GONE);
-                        //imageButton.setVisibility(View.VISIBLE);
                         onClick(videoView);
                     }
                 });
     }
-    View.OnClickListener videoListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.video:
-                    if(videoView.isPlaying()) {
-                        //visiblePause();
-                        videoView.pause();
-                        Toast.makeText(LentaActivity.this, "PAUSE VIDEO", Toast.LENGTH_SHORT).show();
-                    }
-                    else if(videoView.canPause()) {
-                       // imageButton.setImageResource(R.drawable.pause);
-                        videoView.start();
-                        //visibleStart();
-                        Toast.makeText(LentaActivity.this, "PLAY VIDEO", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-        }
-    };
 
     private void nextVideo(){
         videoView.setVideoURI(Uri.parse(pathVideos.get(count)));
         videoView.seekTo(1);
+    }
+    private void scaleDisslike(){
+        final Animation animation = AnimationUtils.loadAnimation(this,R.anim.scale_like);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textDiss.startAnimation(animation);
+            }
+        },2000);
+    }
+    private void scaleLike(){
+        final Animation animation = AnimationUtils.loadAnimation(this,R.anim.scale_like);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                textLike.startAnimation(animation);
+            }
+        },2000);
     }
 //    private void visiblePause(){
 //        final Animation animation = AnimationUtils.loadAnimation(this,R.anim.invisibal);
@@ -213,13 +240,13 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             if(e1.getX()-e2.getY()>SWIPE_MIN_DISTANCE && Math.abs(velocityX)>SWIPE_THRESHOLD_VELOCITY){
                 Toast.makeText(LentaActivity.this, "Right to left", Toast.LENGTH_SHORT).show();
                 count++;
-                videoView.pause();
+                setVideoView(pathVideos);
                 return true; // Right to left
             }
             else if(e2.getX()-e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX)>SWIPE_THRESHOLD_VELOCITY){
                 Toast.makeText(LentaActivity.this, "Left to right", Toast.LENGTH_SHORT).show();
                 count++;
-                videoView.pause();
+                setVideoView(pathVideos);
                 return true; // Left to right
             }
             if(e1.getY()-e2.getY()>SWIPE_MIN_DISTANCE && Math.abs(velocityY)>SWIPE_THRESHOLD_VELOCITY){

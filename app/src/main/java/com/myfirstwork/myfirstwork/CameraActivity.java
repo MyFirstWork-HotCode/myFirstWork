@@ -167,13 +167,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             Log.i(LOG_TAG, "cameraID: "+cameraID);
             int id = Integer.parseInt(cameraID);
             CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraID);
+            int orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             int facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-            if(facing==CameraCharacteristics.LENS_FACING_FRONT){
-                ORIENTATION[id]=270;
-            }
-            else{
-                ORIENTATION[id]=90;
-            }
+            ORIENTATION[id]=orientation;
+//            if(facing==CameraCharacteristics.LENS_FACING_FRONT){
+//                ORIENTATION[id]=90;
+//            }
+//            else{
+//                ORIENTATION[id]=90;
+//            }
+            Log.e("Orientation", String.valueOf(ORIENTATION[0] + ORIENTATION[1]));
             // создаем обработчик для камеры
             cameraServices[id] = new CameraService(mCameraManager,cameraID);
         }
@@ -266,6 +269,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
         mediaRecorder.setVideoFrameRate(profile.videoFrameRate);
         mediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
+        //mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOrientationHint(ORIENTATION[idCamera]);
         mediaRecorder.setVideoEncodingBitRate(profile.videoBitRate);
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
@@ -309,7 +313,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         public void openCamera() {
             try {
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-
                     mCameraManager.openCamera(mCameraID,stateCallback,handler);
                 }
             }
@@ -331,7 +334,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onOpened(@NonNull CameraDevice camera) {
                 mCameraDevice=camera;
-
                 Log.i(LOG_TAG,"Open camera with id :"+ mCameraDevice.getId());
                 createCameraPreviewSession();
             }
@@ -351,14 +353,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         private void createCameraPreviewSession() {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(640,480);
+            surfaceTexture.setDefaultBufferSize(getResources().getDisplayMetrics().widthPixels,getResources().getDisplayMetrics().heightPixels);
             Surface surface = new Surface(surfaceTexture);
             try {
                 builder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
                 builder.addTarget(surface);
                 Surface recordeSurface = mediaRecorder.getSurface();
                 builder.addTarget(recordeSurface);
-
                 mCameraDevice.createCaptureSession(Arrays.asList(surface,mediaRecorder.getSurface()), new CameraCaptureSession.StateCallback() {
                     @Override
                     public void onConfigured(@NonNull CameraCaptureSession session) {
