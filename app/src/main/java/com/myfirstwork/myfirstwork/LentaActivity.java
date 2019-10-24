@@ -69,7 +69,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         setButtonSelect(finder);
         videoView = findViewById(R.id.video);
         setVideoView(pathVideos);
-        videoView.setOnClickListener(videoListener);
+        //videoView.setOnClickListener(videoListener);
         Log.d("HeightMenu", String.valueOf(finder.getHeight()));
         Log.d("HeightMax", String.valueOf(displayMetrics.heightPixels));
         Log.d("Height", String.valueOf(height));
@@ -135,6 +135,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         videoView.setVideoURI(Uri.parse(videoPath.get(count)));
         videoView.requestFocus();
         videoView.seekTo(1);
+        videoView.start();
         videoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

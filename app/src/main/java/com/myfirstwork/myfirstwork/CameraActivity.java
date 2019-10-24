@@ -89,7 +89,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             myCameras = new String[mCameraManager.getCameraIdList().length];
-            getInfoCameras();
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -225,10 +224,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 }else {
                     selectCamera.setVisibility(View.VISIBLE);
                     startRecording.setImageResource(R.drawable.record);
-                    cameraServices[idCamera].stopRecordingVideo();
-                    flagRecording=!flagRecording;
                     Intent intent = new Intent(CameraActivity.this,PreviewActivity.class);
                     intent.putExtra("path",mCurrentFile.getAbsolutePath());
+                    cameraServices[idCamera].stopRecordingVideo();
+                    flagRecording=!flagRecording;
                     startActivity(intent);
                     finish();
                     Toast.makeText(this, "stop recording", Toast.LENGTH_SHORT).show();
@@ -262,7 +261,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mCurrentFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), NAME_VIDEO+".mp4");
+        mCurrentFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), NAME_VIDEO+count+".mp4");
         mediaRecorder.setOutputFile(mCurrentFile.getAbsolutePath());
         CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
         mediaRecorder.setVideoFrameRate(profile.videoFrameRate);

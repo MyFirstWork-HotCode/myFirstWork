@@ -23,10 +23,9 @@ public class PreviewActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         videoView=findViewById(R.id.video_preview);
         File file = new File(Objects.requireNonNull(bundle.getString("path")));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            videoView.setVideoPath(String.valueOf(file.toPath()));
-        }
-        Log.e("PATH", String.valueOf(Uri.parse(bundle.getString("path"))));
+        videoView.setVideoPath(file.getAbsolutePath());
+        videoView.seekTo(1);
         videoView.start();
+
     }
 }
