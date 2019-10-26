@@ -266,7 +266,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mCurrentFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), NAME_VIDEO+count+".mp4");
         mediaRecorder.setOutputFile(mCurrentFile.getAbsolutePath());
-        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
+        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
         mediaRecorder.setVideoFrameRate(profile.videoFrameRate);
         mediaRecorder.setVideoSize(profile.videoFrameWidth, profile.videoFrameHeight);
         //mediaRecorder.setOrientationHint(90);

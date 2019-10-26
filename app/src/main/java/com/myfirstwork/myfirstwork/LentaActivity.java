@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -66,7 +64,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.camera:
-                        Intent intent = new Intent(LentaActivity.this,CameraActivity.class);
+                        Intent intent = new Intent(LentaActivity.this,Camera2VideoActivity.class);
                         startActivity(intent);
                 }
                 return false;
@@ -119,14 +117,14 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     }
 
     private void makeListVideo(){     //create list https
-//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
-//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
-//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
-//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
-        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201417.mp4");
-        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201352.mp4");
-        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201410.mp4");
-        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201401.mp4");
+        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
+        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
+        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
+        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
+//        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201417.mp4");
+//        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201352.mp4");
+//        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201410.mp4");
+//        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201401.mp4");
     }
     private void findIDResourse(){    //find resourse
         like=findViewById(R.id.like);
