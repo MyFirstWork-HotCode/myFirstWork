@@ -1,4 +1,4 @@
-package com.myfirstwork.myfirstwork;
+package com.myfirstwork.myfirstwork.activity.main;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -29,6 +29,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.activity.post.Camera2VideoActivity;
 
 import java.util.ArrayList;
 
@@ -64,7 +66,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.camera:
-                        Intent intent = new Intent(LentaActivity.this,Camera2VideoActivity.class);
+                        Intent intent = new Intent(LentaActivity.this, Camera2VideoActivity.class);
                         startActivity(intent);
                 }
                 return false;
@@ -149,7 +151,8 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     }
     @SuppressLint("ClickableViewAccessibility")
     private void setVideoView(final ArrayList<String> videoPath){
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(displayMetrics.heightPixels-(180*displayMetrics.scaledDensity)));
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                (int)(displayMetrics.heightPixels-(180*displayMetrics.scaledDensity)));
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         videoView.setLayoutParams(params);
         videoView.setVideoURI(Uri.parse(videoPath.get(count)));

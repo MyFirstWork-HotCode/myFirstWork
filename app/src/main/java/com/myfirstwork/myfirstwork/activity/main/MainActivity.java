@@ -1,7 +1,4 @@
-package com.myfirstwork.myfirstwork;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+package com.myfirstwork.myfirstwork.activity.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +9,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.myfirstwork.myfirstwork.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else if (view.getId()==signUp.getId()){
             signUping(String.valueOf(email.getText()),String.valueOf(password.getText()));
         }else {
-            Intent intent = new Intent(context,LentaActivity.class);
+            Intent intent = new Intent(context, LentaActivity.class);
             startActivity(intent);
         }
     }

@@ -8,4 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <declare-styleable name="MyGallery">
+        <attr name="ItemBackground"/>
+    </declare-styleable>
 </resources>

@@ -1,4 +1,4 @@
-package com.myfirstwork.myfirstwork;
+package com.myfirstwork.myfirstwork.activity;
 
 
 import android.Manifest;
@@ -33,6 +33,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.activity.post.PreviewActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -227,7 +230,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 }else {
                     selectCamera.setVisibility(View.VISIBLE);
                     startRecording.setImageResource(R.drawable.record);
-                    Intent intent = new Intent(CameraActivity.this,PreviewActivity.class);
+                    Intent intent = new Intent(CameraActivity.this, PreviewActivity.class);
                     intent.putExtra("path",mCurrentFile.getAbsolutePath());
                     cameraServices[idCamera].stopRecordingVideo();
                     flagRecording=!flagRecording;

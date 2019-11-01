@@ -1,4 +1,4 @@
-package com.myfirstwork.myfirstwork;
+package com.myfirstwork.myfirstwork.activity.post;
 
 import android.Manifest;
 import android.content.Context;
@@ -40,6 +40,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.myfirstwork.myfirstwork.R;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,6 +54,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import static com.myfirstwork.myfirstwork.activity.CameraActivity.LOG_TAG;
+
 public class Camera2VideoActivity extends AppCompatActivity {
 
     private static final String TAG = "Camera2VideoImageActivi";
@@ -61,6 +65,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAIT_LOCK = 1;
     private int mCaptureState = STATE_PREVIEW;
+    private File videoFile;
     private TextureView mTextureView;
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
@@ -93,7 +98,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
             mMediaRecorder = new MediaRecorder();
             if(mIsRecording) {
                 try {
-                    createVideoFileName();
+                    videoFile=createVideoFileName();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -306,7 +311,11 @@ public class Camera2VideoActivity extends AppCompatActivity {
                     Intent mediaStoreUpdateIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                     mediaStoreUpdateIntent.setData(Uri.fromFile(new File(mVideoFileName)));
                     sendBroadcast(mediaStoreUpdateIntent);
-
+                    Intent intent = new Intent(Camera2VideoActivity.this, PreviewActivity.class);
+                    Log.i(LOG_TAG,videoFile.getAbsolutePath());
+                    intent.putExtra("video",videoFile.getAbsolutePath());
+                    startActivity(intent);
+                    finish();
                 } else {
                     mIsRecording = true;
                     mRecordImageButton.setImageResource(R.drawable.stop);
@@ -605,7 +614,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
 
     private void createVideoFolder() {
         File movieFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-        mVideoFolder = new File(movieFile, "camera2VideoImage");
+        mVideoFolder = new File(movieFile, "MyFirstWork");
         if(!mVideoFolder.exists()) {
             mVideoFolder.mkdirs();
         }
@@ -621,7 +630,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
 
     private void createImageFolder() {
         File imageFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        mImageFolder = new File(imageFile, "camera2VideoImage");
+        mImageFolder = new File(imageFile, "MyFirstWork");
         if(!mImageFolder.exists()) {
             mImageFolder.mkdirs();
         }
@@ -640,7 +649,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
                 try {
-                    createVideoFileName();
+                    videoFile=createVideoFileName();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -659,7 +668,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
             }
         } else {
             try {
-                createVideoFileName();
+                videoFile=createVideoFileName();
             } catch (IOException e) {
                 e.printStackTrace();
             }
