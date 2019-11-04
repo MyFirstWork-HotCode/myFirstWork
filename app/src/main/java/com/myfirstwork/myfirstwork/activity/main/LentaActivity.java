@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.myfirstwork.myfirstwork.R;
-import com.myfirstwork.myfirstwork.activity.post.Camera2VideoActivity;
 
 import java.util.ArrayList;
 
@@ -66,7 +65,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.camera:
-                        Intent intent = new Intent(LentaActivity.this, Camera2VideoActivity.class);
+                        Intent intent = new Intent(LentaActivity.this, CameraActivity.class);
                         startActivity(intent);
                 }
                 return false;

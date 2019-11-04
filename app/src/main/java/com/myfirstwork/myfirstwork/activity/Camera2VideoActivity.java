@@ -1,4 +1,4 @@
-package com.myfirstwork.myfirstwork.activity.post;
+package com.myfirstwork.myfirstwork.activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -41,6 +41,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.activity.post.PreviewActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +55,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import static com.myfirstwork.myfirstwork.activity.CameraActivity.LOG_TAG;
 
 public class Camera2VideoActivity extends AppCompatActivity {
 
@@ -64,7 +64,9 @@ public class Camera2VideoActivity extends AppCompatActivity {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT = 1;
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAIT_LOCK = 1;
+    private static final String LOG_TAG = "Log";
     private int mCaptureState = STATE_PREVIEW;
+    private CameraDevice mCameraDevice;
     private File videoFile;
     private TextureView mTextureView;
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
@@ -81,6 +83,12 @@ public class Camera2VideoActivity extends AppCompatActivity {
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            Log.e(TAG, "onSurfaceTextureDestroyed");
+            if(mCameraDevice != null){
+                closeCamera();
+
+                mCameraDevice = null;
+            }
             return false;
         }
 
@@ -90,7 +98,7 @@ public class Camera2VideoActivity extends AppCompatActivity {
         }
     };
 
-    private CameraDevice mCameraDevice;
+
     private CameraDevice.StateCallback mCameraDeviceStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {

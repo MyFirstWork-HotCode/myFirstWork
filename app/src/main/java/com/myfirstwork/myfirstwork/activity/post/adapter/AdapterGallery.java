@@ -58,7 +58,7 @@ public class AdapterGallery extends BaseAdapter {
                 break;
         }
         textView.setGravity(Gravity.CENTER);
-        textView.setTextSize(6*scale);
+        textView.setTextSize(12*scale);
         textView.setPadding(150,0,150,0);
         textView.setTextColor(Color.WHITE);
         textView.setBackgroundResource(backgroundItem);

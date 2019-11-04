@@ -19,6 +19,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.data.DBHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context=this;
+        DBHelper dbHelper = new DBHelper(this);
+        dbHelper.close();
         go=findViewById(R.id.go);
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
