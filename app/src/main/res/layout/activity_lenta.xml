@@ -107,6 +107,7 @@
                 android:layout_toRightOf="@id/avatar_img"
                 android:layout_marginLeft="20dp"/>
             <TextView
+                android:id="@+id/info_work"
                 android:textColor="@android:color/background_light"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

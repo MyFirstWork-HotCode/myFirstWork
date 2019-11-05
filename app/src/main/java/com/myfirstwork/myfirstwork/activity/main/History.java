@@ -26,7 +26,7 @@ public class History extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/").child("Егор Летов - Моя оборона.mp4");
+        storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/vacansi/VIDEO_20191105_035338_1353030900698121628.mp4");
         videoView=findViewById(R.id.video);
         try {
             File localFile = File.createTempFile("video","mp4");
