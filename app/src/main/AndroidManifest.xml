@@ -31,6 +31,7 @@
             android:hardwareAccelerated="false"
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.main.CameraActivity"/>
+        <activity android:name=".activity.main.History"/>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.myfirstwork.myfirstwork.activity.post;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -12,16 +13,27 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.SearchView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.myfirstwork.myfirstwork.R;
 import com.myfirstwork.myfirstwork.activity.post.adapter.AdapterGallery;
 import com.myfirstwork.myfirstwork.activity.post.adapter.AdapterList;
 import com.myfirstwork.myfirstwork.data.Query;
 import com.myfirstwork.myfirstwork.data.source.Tag;
+import com.myfirstwork.myfirstwork.data.source.Video;
 import com.myfirstwork.myfirstwork.databinding.ActivityPreviewVideoBinding;
 
 import java.io.File;
@@ -32,6 +44,10 @@ import java.util.Objects;
 public class PreviewActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String LOG_TAG =" PreviewActivity" ;
+    private static int COLUMS = 4;
+    private  File file;
+    private FirebaseStorage storage;
+    private FirebaseFirestore firestore;
     AdapterGallery adapterGallery;
     DisplayMetrics displayMetrics;
     RadioButton[] radioButtons = new RadioButton[3];
@@ -40,11 +56,16 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     ActivityPreviewVideoBinding activityPreviewVideoBinding;
     AdapterList adapterList;
     ArrayList<Tag> tags = new ArrayList<>();
+    ArrayList<String> textTags = new ArrayList<>();
+    TextView textView, textInfo;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityPreviewVideoBinding = DataBindingUtil.setContentView(this,R.layout.activity_preview_video);
         Bundle bundle = getIntent().getExtras();
+        storage = FirebaseStorage.getInstance();
+        firestore = FirebaseFirestore.getInstance();
         displayMetrics=getResources().getDisplayMetrics();
         Query query = new Query(this);
         tags= (ArrayList<Tag>) query.getTags();
@@ -55,18 +76,15 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         radioButtons[2]=findViewById(R.id.item2);
         searchView=findViewById(R.id.edit_tag);
         listView = findViewById(R.id.list);
+        textView = findViewById(R.id.text_tag);
+        textInfo = findViewById(R.id.edit_text);
         listView.setAdapter(adapterList);
-
         activityPreviewVideoBinding.item0.setOnClickListener(this);
         activityPreviewVideoBinding.item1.setOnClickListener(this);
         activityPreviewVideoBinding.item2.setOnClickListener(this);
-
-        //searchView.setActivated(true);
         searchView.setQueryHint("Теги");
         listView.setVisibility(View.GONE);
-        //searchView.onActionViewExpanded();
-        //searchView.setIconified(false);
-        //searchView.clearFocus();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -78,6 +96,31 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 listView.setVisibility(View.VISIBLE);
                 adapterList.getFilter().filter(newText);
                 return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                listView.setVisibility(View.GONE);
+                return false;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView text = new TextView(getApplicationContext());
+                text.setText(adapterList.getFilter().convertResultToString(adapterList.getItem(position)));
+                text.setBackgroundResource(R.drawable.button_view);
+                textTags.add((String) text.getText());
+                listView.setVisibility(View.GONE);
+                String s="";
+                for(int i = 0; i<textTags.size();i++){
+                    String s1=textTags.get(i)+"   ";
+                    s+=s1;
+                }
+                textView.setText(s);
             }
         });
 
@@ -98,7 +141,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
         assert bundle != null;
-        File file = new File(Objects.requireNonNull(bundle.getString("video")));
+        file = new File(Objects.requireNonNull(bundle.getString("video")));
         setVideoView(file.getAbsolutePath());
         activityPreviewVideoBinding.post.setOnClickListener(this);
     }
@@ -117,6 +160,42 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case  R.id.item2:
                 activityPreviewVideoBinding.gallery.setSelection(2,true);
+                break;
+            case R.id.post:
+                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/")
+                        .child(file.getName());
+                UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(PreviewActivity.this, "Error in upload!(", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        Video video = new Video();
+                        video.setDislikes(0);
+                        video.setLikes(0);
+                        video.setName(file.getName());
+                        video.setInfo(textInfo.getText().toString());
+                        video.setPath(storageReference.getPath());
+
+                        firestore.collection("videos").add(video).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                finish();
+                                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(PreviewActivity.this, "Video database error!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+
                 break;
 
         }
@@ -138,5 +217,14 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             strings.add(tag.getName());
         }
         return strings;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!searchView.isIconified()){
+            searchView.onActionViewCollapsed();
+        }else{
+            super.onBackPressed();
+        }
     }
 }

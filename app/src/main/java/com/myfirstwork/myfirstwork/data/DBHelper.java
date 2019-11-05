@@ -7,15 +7,34 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static String DATABASENAME ="MFWDatabase";
-    public static int VERSION = 1;
+    public static int VERSION = 2;
 
     public static String ID="_id";
     //TAGS
     public static String TABLE_TAGS="tags_table";
     public static String TAGS_NAME="name";
+
+    //VIDEOS
+    public static String TABLE_VIDEO="videos";
+    public static String VIDEP_PATH="path";
+    public static String VIDEO_NAME="name";
+    public static String VIDEO_LIKE="likes";
+    public static String VIDEO_DISLIKE="dislike";
+    public static String VIDEO_USERID="user_id";
+
+    //USERS
+    public static String TABLE_USERS="users";
+    public static String USERS_NAME="name";
+    public static String USERS_OLD="old";
+    public static String USERS_SEX="sex";
+    public static String USERS_POST="post";
+    public static String USERS_ORGANIZATION_ID="organization_id";
+
+    //ORGANIZATION
+    public static String TABLE_ORGANIZATION="organization";
+
     public DBHelper(Context context){
         super(context,DATABASENAME,null,VERSION);
-
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -23,6 +42,19 @@ public class DBHelper extends SQLiteOpenHelper {
                 ID+" integer not null primary key autoincrement unique, "+
                 TAGS_NAME+" text not null "+
                 ")");
+        db.execSQL("create table "+TABLE_VIDEO+" ("+
+                ID+" integer not null primary key autoincrement unique, "+
+                VIDEP_PATH+" text not null, " +
+                VIDEO_NAME+" text not null, " +
+                VIDEO_LIKE+" integer default 0, " +
+                VIDEO_DISLIKE+" integer default 0, " +
+                VIDEO_USERID+" integer references " +
+                TABLE_USERS+" ( "+ID+" ) )");
+        db.execSQL("create table "+TABLE_USERS+" (" +
+                USERS_NAME+" text not null, " +
+                USERS_OLD+" integer not null, " +
+                USERS_SEX+" text not null, " +
+                USERS_POST+" text )");
         DefaultData.createTagsName(db);
     }
 

@@ -63,10 +63,16 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Intent intent;
                 switch (menuItem.getItemId()){
                     case R.id.camera:
-                        Intent intent = new Intent(LentaActivity.this, CameraActivity.class);
+                        intent = new Intent(LentaActivity.this, CameraActivity.class);
                         startActivity(intent);
+                        break;
+                    case R.id.history:
+                        intent = new Intent(LentaActivity.this, History.class);
+                        startActivity(intent);
+                        break;
                 }
                 return false;
             }
