@@ -59,6 +59,8 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<String> textTags = new ArrayList<>();
     TextView textView, textInfo;
 
+    Video video = new Video();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,6 +134,17 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(LOG_TAG, String.valueOf(position));
                 activityPreviewVideoBinding.group.check(radioButtons[position].getId());
+                switch (position){
+                    case 0:
+                        video.setChild("vacansi/");
+                        break;
+                    case 1:
+                        video.setChild("finder/");
+                        break;
+                    case 2:
+                        video.setChild("blog/");
+                        break;
+                }
             }
 
 
@@ -154,15 +167,18 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.item0:
                 activityPreviewVideoBinding.gallery.setSelection(0,true);
+                video.setChild("vacansi/");
                 break;
             case R.id.item1:
                 activityPreviewVideoBinding.gallery.setSelection(1,true);
+                video.setChild("finder/");
                 break;
             case  R.id.item2:
                 activityPreviewVideoBinding.gallery.setSelection(2,true);
+                video.setChild("blog/");
                 break;
             case R.id.post:
-                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/")
+                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/").child(video.getChild())
                         .child(file.getName());
                 UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
                 uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -174,7 +190,6 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                        Video video = new Video();
                         video.setDislikes(0);
                         video.setLikes(0);
                         video.setName(file.getName());

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -28,10 +29,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.myfirstwork.myfirstwork.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class LentaActivity extends AppCompatActivity implements Button.OnClickListener {
@@ -48,17 +56,40 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     Handler handler = new Handler();
     private GestureDetector gestureDetector;
     Animation animation, videoAnimation;
+
+    private String [] child = {"vacansi/", "finder/","blog/"};
+    private int position = 0;
+    private FirebaseFirestore firestore;
+    private ArrayList<Map<String,Object>> videos = new ArrayList<>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lenta);
         displayMetrics = getResources().getDisplayMetrics();
+        firestore = FirebaseFirestore.getInstance();
         gestureDetector = new GestureDetector(this,new GestureListener());
         animation = AnimationUtils.loadAnimation(this,R.anim.scale_like);
         videoAnimation = AnimationUtils.loadAnimation(this,R.anim.video_animation);
         findIDResourse();
         setOnClickListener();
         makeListVideo();
+        firestore.collection("videos")
+                .whereEqualTo("child",child[position])
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for (QueryDocumentSnapshot snapshot : task.getResult() ){
+                        Map<String,Object> map = new HashMap<>();
+                        Log.d("READ", snapshot.getId() + " => " + snapshot.getData());
+                        map=snapshot.getData();
+                        videos.add(map);
+                    }
+                }else {
+                        Log.d("READ", "Error getting documents: ", task.getException());
+                }
+            }
+        });
         height=displayMetrics.heightPixels-(int)(90*2*displayMetrics.scaledDensity);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -79,23 +110,26 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         });
         setButtonSelect(finder);
         videoView = findViewById(R.id.video);
-        setVideoView(pathVideos);
+       // setVideoView(pathVideos);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.bloger:
+                position = 2;
                 setButtonSelect(view);
                 setButtonNoSelect(finder);
                 setButtonNoSelect(work);
                 break;
             case R.id.finder:
+                position = 1;
                 setButtonSelect(view);
                 setButtonNoSelect(bloger);
                 setButtonNoSelect(work);
                 break;
             case R.id.work:
+                position = 0;
                 setButtonSelect(view);
                 setButtonNoSelect(finder);
                 setButtonNoSelect(bloger);
@@ -103,13 +137,11 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             case R.id.diss:
                 dislike.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
-                count++;
                 nextVideo();
                 break;
             case R.id.like:
                 like.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
-                count++;
                 nextVideo();
                 break;
         }
@@ -124,10 +156,10 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     }
 
     private void makeListVideo(){     //create list https
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
-        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/8lqi5zJXF27i0Q");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/tMUqA9WVbEaCWg");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/PWPqRkS8CCe6Hg");
+//        pathVideos.add("https://getfile.dokpub.com/yandex/get/https://yadi.sk/i/3UeJXH38B-vq7Q");
 //        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201417.mp4");
 //        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201352.mp4");
 //        pathVideos.add("/storage/emulated/0/DCIM/Camera/VID_20191024_201410.mp4");

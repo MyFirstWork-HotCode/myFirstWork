@@ -8,7 +8,7 @@ public class Video {
     private int likes;
     private int dislikes;
     private int user_id;
-
+    private String child;
 
     public int getId() {
         return id;
@@ -64,5 +64,13 @@ public class Video {
 
     public void setDislikes(int dislikes) {
         this.dislikes = dislikes;
+    }
+
+    public String getChild() {
+        return child;
+    }
+
+    public void setChild(String child) {
+        this.child = child;
     }
 }
