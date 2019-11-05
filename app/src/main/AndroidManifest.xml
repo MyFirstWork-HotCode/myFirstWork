@@ -37,6 +37,12 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.main.History"
             android:screenOrientation="portrait"/>
+        <activity android:name=".activity.main.Tests"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.main.Profile"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.main.TestUnit"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -98,6 +98,14 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                         intent = new Intent(LentaActivity.this, History.class);
                         startActivity(intent);
                         break;
+                    case R.id.tests:
+                        intent = new Intent(LentaActivity.this, TestUnit.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.profile:
+                        intent = new Intent(LentaActivity.this, Profile.class);
+                        startActivity(intent);
+                        break;
                 }
                 return false;
             }
