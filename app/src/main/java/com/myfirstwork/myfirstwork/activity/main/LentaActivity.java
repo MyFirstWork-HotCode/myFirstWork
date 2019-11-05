@@ -53,13 +53,13 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     DisplayMetrics displayMetrics;
     BottomNavigationView bottomNavigationView;
     ProgressBar progressBar;
-    ImageView like,dislike;
-    TextView textLike,textDiss,textInfoWork;
+    ImageView like,dislike,avatar;
+    TextView textLike,textDiss,textInfoWork,date,name,postUser;
     int height;
     Handler handler = new Handler();
     Animation animation, videoAnimation;
 
-    private String [] child = {"vacansi/", "finder/","blog/"};
+    private String [] child = {"finder/","vacansi/","blog/"};
     private int position = 0;
     private FirebaseFirestore firestore;
     private FirebaseStorage storage;
@@ -92,6 +92,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                     case R.id.camera:
                         intent = new Intent(LentaActivity.this, CameraActivity.class);
                         startActivity(intent);
+                        finish();
                         break;
                     case R.id.history:
                         intent = new Intent(LentaActivity.this, History.class);
@@ -114,32 +115,36 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                 videoView.pause();
                 videos.clear();
                 count=0;
+                setVisibleGone();
                 queryFireBase();
                 break;
             case R.id.finder:
-                position = 1;
+                position = 0;
                 setButtonSelect(view);
                 setButtonNoSelect(bloger);
                 setButtonNoSelect(work);
                 videoView.pause();
                 videos.clear();
                 count=0;
+                setVisibleGone();
                 queryFireBase();
                 break;
             case R.id.work:
-                position = 0;
+                position = 1;
                 setButtonSelect(view);
                 setButtonNoSelect(finder);
                 setButtonNoSelect(bloger);
                 videoView.pause();
                 videos.clear();
                 count=0;
+                setVisibleGone();
                 queryFireBase();
                 break;
             case R.id.diss:
                 videoView.pause();
                 dislike.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
+                setVisibleGone();
                 count++;
                 try {
                     nextVideo((String) videos.get(count).get("path"));
@@ -151,6 +156,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                 videoView.pause();
                 like.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
+                setVisibleGone();
                 count++;
                 try {
                     nextVideo((String) videos.get(count).get("path"));
@@ -171,7 +177,12 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     }
 
     private void findIDResourse(){    //find resourse
+
         like=findViewById(R.id.like);
+        avatar=findViewById(R.id.avatar_img);
+        date=findViewById(R.id.date);
+        name=findViewById(R.id.name);
+        postUser=findViewById(R.id.post_user);
         textInfoWork=findViewById(R.id.info_work);
         textDiss=findViewById(R.id.diss_text);
         textLike=findViewById(R.id.like_text);
@@ -183,6 +194,31 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         progressBar=findViewById(R.id.progress_bar);
         bottomNavigationView=findViewById(R.id.bottom_menu);
         bottomNavigationView.setSelectedItemId(R.id.lenta);
+
+        setVisibleGone();
+
+    }
+
+    private void setVisibleGone(){
+        avatar.setVisibility(View.GONE);
+        date.setVisibility(View.GONE);
+        name.setVisibility(View.GONE);
+        postUser.setVisibility(View.GONE);
+        textLike.setVisibility(View.GONE);
+        textDiss.setVisibility(View.GONE);
+        textInfoWork.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void setVisible(){
+        progressBar.setVisibility(View.GONE);
+        avatar.setVisibility(View.VISIBLE);
+        date.setVisibility(View.VISIBLE);
+        name.setVisibility(View.VISIBLE);
+        postUser.setVisibility(View.VISIBLE);
+        textLike.setVisibility(View.VISIBLE);
+        textDiss.setVisibility(View.VISIBLE);
+        textInfoWork.setVisibility(View.VISIBLE);
     }
     private void setOnClickListener(){
         bloger.setOnClickListener(this);
@@ -206,7 +242,9 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         progressBar.setVisibility(View.GONE);
+                        setVisible();
                         textInfoWork.setText(String.valueOf(videos.get(count).get("info")));
+                        date.setText(String.valueOf(videos.get(count).get("dateTime")));
                         onClick(videoView);
                     }
                 });

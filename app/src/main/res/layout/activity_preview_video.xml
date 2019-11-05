@@ -8,6 +8,14 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     tools:context=".activity.post.PreviewActivity">
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="false"
+        android:progress="0"
+        android:max="100"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

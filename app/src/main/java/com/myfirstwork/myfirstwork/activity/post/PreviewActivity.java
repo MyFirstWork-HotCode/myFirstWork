@@ -1,6 +1,7 @@
 package com.myfirstwork.myfirstwork.activity.post;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -26,15 +27,19 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.activity.main.LentaActivity;
 import com.myfirstwork.myfirstwork.activity.post.adapter.AdapterGallery;
 import com.myfirstwork.myfirstwork.activity.post.adapter.AdapterList;
 import com.myfirstwork.myfirstwork.data.Query;
 import com.myfirstwork.myfirstwork.data.source.Tag;
 import com.myfirstwork.myfirstwork.data.source.Video;
 import com.myfirstwork.myfirstwork.databinding.ActivityPreviewVideoBinding;
+
+import org.joda.time.LocalDateTime;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,9 +63,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<Tag> tags = new ArrayList<>();
     ArrayList<String> textTags = new ArrayList<>();
     TextView textView, textInfo;
-
     Video video = new Video();
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +84,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
         textView = findViewById(R.id.text_tag);
         textInfo = findViewById(R.id.edit_text);
         listView.setAdapter(adapterList);
+        activityPreviewVideoBinding.progressBar.setVisibility(View.GONE);
         activityPreviewVideoBinding.item0.setOnClickListener(this);
         activityPreviewVideoBinding.item1.setOnClickListener(this);
         activityPreviewVideoBinding.item2.setOnClickListener(this);
@@ -186,6 +190,13 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(PreviewActivity.this, "Error in upload!(", Toast.LENGTH_SHORT).show();
                     }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                        activityPreviewVideoBinding.progressBar.setVisibility(View.VISIBLE);
+                        int progress = (int) ((taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount())*100);
+                        activityPreviewVideoBinding.progressBar.setProgress(progress);
+                    }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -195,10 +206,13 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                         video.setName(file.getName());
                         video.setInfo(textInfo.getText().toString());
                         video.setPath(storageReference.getPath());
-
+                        video.setDataTime(LocalDateTime.now().getYear()+"."+LocalDateTime.now().getMonthOfYear()+
+                                LocalDateTime.now().getDayOfMonth()+'\n'+LocalDateTime.now().getHourOfDay()+":"+LocalDateTime.now().getMinuteOfHour());
                         firestore.collection("videos").add(video).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
+                                Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
+                                startActivity(intent);
                                 finish();
                                 Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
                             }

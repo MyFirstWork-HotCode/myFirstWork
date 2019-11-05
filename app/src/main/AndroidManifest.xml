@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.main.MainActivity">
+        <activity android:name=".activity.main.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,8 +31,10 @@
         <activity android:name=".activity.post.PreviewActivity"
             android:hardwareAccelerated="false"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.main.CameraActivity"/>
-        <activity android:name=".activity.main.History"/>
+        <activity android:name=".activity.main.CameraActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.main.History"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

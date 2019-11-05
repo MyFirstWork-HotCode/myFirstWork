@@ -9,6 +9,7 @@ public class Video {
     private int dislikes;
     private int user_id;
     private String child;
+    private String dataTime;
 
     public int getId() {
         return id;
@@ -72,5 +73,13 @@ public class Video {
 
     public void setChild(String child) {
         this.child = child;
+    }
+
+    public String getDataTime() {
+        return dataTime;
+    }
+
+    public void setDataTime(String dataTime) {
+        this.dataTime = dataTime;
     }
 }
