@@ -1,9 +1,11 @@
 package com.myfirstwork.myfirstwork.activity.main;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +26,7 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,6 +41,9 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.myfirstwork.myfirstwork.R;
+import com.myfirstwork.myfirstwork.data.Query;
+import com.myfirstwork.myfirstwork.data.source.User;
+import com.myfirstwork.myfirstwork.data.source.Video;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,40 +60,45 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     BottomNavigationView bottomNavigationView;
     ProgressBar progressBar;
     ImageView like,dislike,avatar;
-    TextView textLike,textDiss,textInfoWork,date,name,postUser;
+    private TextView textLike,textDiss,textInfoWork,date,name,postUser;
     int height;
     Handler handler = new Handler();
     Animation animation, videoAnimation;
-
+    private ArrayList<Video> videos = new ArrayList<>();
     private String [] child = {"finder/","vacansi/","blog/"};
     private int position = 0;
     private FirebaseFirestore firestore;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private ArrayList<Map<String,Object>> videos = new ArrayList<>();
-
+    Query query;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lenta);
+        findIDResourse();
         displayMetrics = getResources().getDisplayMetrics();
         height=displayMetrics.heightPixels-(int)(90*2*displayMetrics.scaledDensity);
-
+        query = new Query(this);
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-
+        videos = query.getVideos();
+        for (Video video : videos){
+            Log.i("VIDEO_INFO",video.getPath()+"  "+video.getInfo() +" Like "
+                    + video.getLikes()+" Dislike "+video.getDislikes());
+        }
         animation = AnimationUtils.loadAnimation(this,R.anim.scale_like);
         videoAnimation = AnimationUtils.loadAnimation(this,R.anim.video_animation);
-        findIDResourse();
         setOnClickListener();
-        setButtonSelect(finder);
-
-        queryFireBase();
+        setButtonSelect(bloger);
+        setVideoView(videos.get(count));
+//        setDataVideo(videos.get(count));
+        //queryFireBase();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Intent intent;
+                AlertDialog.Builder builder = new AlertDialog.Builder(LentaActivity.this);
                 switch (menuItem.getItemId()){
                     case R.id.camera:
                         intent = new Intent(LentaActivity.this, CameraActivity.class);
@@ -95,16 +106,42 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                         finish();
                         break;
                     case R.id.history:
-                        intent = new Intent(LentaActivity.this, History.class);
-                        startActivity(intent);
+                        builder = new AlertDialog.Builder(LentaActivity.this);
+                        builder.setTitle("Приносим извинения").setMessage("Раздел \"История\" пока находится в разработке." +
+                                        " Здесь вы сможете найти недавно просмотренные видео с вакансиями, блогами и резюме")
+                                .setPositiveButton("Понятно", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+//                        intent = new Intent(LentaActivity.this, History.class);
+//                        startActivity(intent);
                         break;
                     case R.id.tests:
-                        intent = new Intent(LentaActivity.this, TestUnit.class);
-                        startActivity(intent);
+                        builder.setTitle("Приносим извинения").setMessage("Раздел \"Тесты\" пока находится в разработке." +
+                                " Здесь вы сможете пройти тесты на профориентацию и, тем самым, обучить нашу сеть для подбора наиболее " +
+                                "интересных для вас видео")
+                                .setPositiveButton("Понятно", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+//                        intent = new Intent(LentaActivity.this, TestUnit.class);
+//                        startActivity(intent);
                         break;
                     case R.id.profile:
-                        intent = new Intent(LentaActivity.this, Profile.class);
-                        startActivity(intent);
+                        builder.setTitle("Приносим извинения").setMessage("Раздел \"Мой профиль\" пока находится в разработке." +
+                                " Здесь вы сможете редактировать свой аккаунт и управлять своими публикациями")
+                                .setPositiveButton("Понятно", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                }).show();
+//                        intent = new Intent(LentaActivity.this, Profile.class);
+//                        startActivity(intent);
                         break;
                 }
                 return false;
@@ -120,57 +157,75 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                 setButtonSelect(view);
                 setButtonNoSelect(finder);
                 setButtonNoSelect(work);
-                videoView.pause();
-                videos.clear();
-                count=0;
-                setVisibleGone();
-                queryFireBase();
+                if(videoView.isPlaying()) {
+                    videoView.pause();
+                }else{
+                    videoView.start();
+                    progressBar.setVisibility(View.GONE);
+                }
+                //videos.clear();
+                //count=0;
+                //setVisibleGone();
+                //queryFireBase();
                 break;
             case R.id.finder:
-                position = 0;
-                setButtonSelect(view);
-                setButtonNoSelect(bloger);
-                setButtonNoSelect(work);
-                videoView.pause();
-                videos.clear();
-                count=0;
-                setVisibleGone();
-                queryFireBase();
+//                position = 0;
+//                setButtonSelect(view);
+//                setButtonNoSelect(bloger);
+//                setButtonNoSelect(work);
+//                videoView.pause();
+//                videos.clear();
+//                count=0;
+//                setVisibleGone();
+//                //queryFireBase();
                 break;
             case R.id.work:
-                position = 1;
-                setButtonSelect(view);
-                setButtonNoSelect(finder);
-                setButtonNoSelect(bloger);
-                videoView.pause();
-                videos.clear();
-                count=0;
-                setVisibleGone();
-                queryFireBase();
+//                position = 1;
+//                setButtonSelect(view);
+//                setButtonNoSelect(finder);
+//                setButtonNoSelect(bloger);
+//                videoView.pause();
+//                videos.clear();
+//                count=0;
+//                setVisibleGone();
+//                //queryFireBase();
                 break;
             case R.id.diss:
-                videoView.pause();
+                videoView.stopPlayback();
+                query.updateDislikeVideo(videos.get(count).getDislikes()+1,videos.get(count).getPath());
                 dislike.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
                 setVisibleGone();
                 count++;
                 try {
-                    nextVideo((String) videos.get(count).get("path"));
-                }catch (IndexOutOfBoundsException e){
-                    Toast.makeText(this, "Новых записей нет записей", Toast.LENGTH_SHORT).show();
+                    setVideoView(videos.get(count));
+                }catch (Exception e){
+                    Toast.makeText(this, "Новых видео нет(", Toast.LENGTH_SHORT).show();
                 }
+
+//                try {
+//                    //nextVideo((String) videos.get(count).get("path"));
+//                }catch (IndexOutOfBoundsException e){
+//                    Toast.makeText(this, "Новых записей нет записей", Toast.LENGTH_SHORT).show();
+//                }
                 break;
             case R.id.like:
-                videoView.pause();
+                videoView.stopPlayback();
+                query.updateLikeVideo(videos.get(count).getLikes()+1,videos.get(count).getPath());
                 like.startAnimation(animation);
                 videoView.startAnimation(videoAnimation);
                 setVisibleGone();
                 count++;
                 try {
-                    nextVideo((String) videos.get(count).get("path"));
-                }catch (IndexOutOfBoundsException e){
-                    Toast.makeText(this, "Новых записей нет записей", Toast.LENGTH_SHORT).show();
+                    setVideoView(videos.get(count));
+                }catch (Exception e){
+                    Toast.makeText(this, "Новых видео нет(", Toast.LENGTH_SHORT).show();
                 }
+//                try {
+//                    //nextVideo((String) videos.get(count).get("path"));
+//                }catch (IndexOutOfBoundsException e){
+//                    Toast.makeText(this, "Новых записей нет записей", Toast.LENGTH_SHORT).show();
+//                }
 
                 break;
         }
@@ -192,7 +247,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         name=findViewById(R.id.name);
         postUser=findViewById(R.id.post_user);
         textInfoWork=findViewById(R.id.info_work);
-        textDiss=findViewById(R.id.diss_text);
+        textDiss=findViewById(R.id.disstext);
         textLike=findViewById(R.id.like_text);
         dislike=findViewById(R.id.diss);
         videoView = findViewById(R.id.video);
@@ -238,21 +293,23 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
         textDiss.setOnClickListener(this);
     }
     @SuppressLint("ClickableViewAccessibility")
-    private void setVideoView(final String videoPath){
+    private void setVideoView(final Video video){
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 (int)(displayMetrics.heightPixels-(180*displayMetrics.scaledDensity)));
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         videoView.setLayoutParams(params);
-        videoView.setVideoPath(videoPath);
+        videoView.setVideoURI(Uri.parse(video.getPath()));
         videoView.requestFocus();
         videoView.seekTo(1);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         progressBar.setVisibility(View.GONE);
+                        videoView.start();
                         setVisible();
-                        textInfoWork.setText(String.valueOf(videos.get(count).get("info")));
-                        date.setText(String.valueOf(videos.get(count).get("dateTime")));
+                        setDataVideo(video);
+                        //textInfoWork.setText(String.valueOf(videos.get(count).get("info")));
+                        //date.setText(String.valueOf(videos.get(count).get("dateTime")));
                         onClick(videoView);
                     }
                 });
@@ -266,7 +323,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             storageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    setVideoView(localFile.getAbsolutePath());
+                    //setVideoView(localFile.getAbsolutePath());
 
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -311,13 +368,37 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
                         Map<String,Object> map = new HashMap<>();
                         Log.d("READ", snapshot.getId() + " => " + snapshot.getData());
                         map=snapshot.getData();
-                        videos.add(map);
+                      //  videos.add(map);
                     }
-                    nextVideo((String) videos.get(count).get("path"));
+                    //nextVideo((String) videos.get(count).get("path"));
                 }else {
                     Log.d("READ", "Error getting documents: ", task.getException());
                 }
             }
         });
+    }
+
+    private Uri getAssetsPath(ArrayList<Video> videos) {
+        String s = "";
+        try {
+            s = videos.get(count).getPath();
+        }catch (Exception e){
+            Toast.makeText(this, "Новых видео нет(", Toast.LENGTH_SHORT).show();
+        }
+
+        return  Uri.parse(s);
+    }
+
+    private void setDataVideo(Video video) {
+        textInfoWork.setText(video.getInfo());
+        textDiss.setText(video.getDislikes() + "");
+        textLike.setText(video.getLikes() + "");
+        try {
+            User user = query.getUserByPath(video.getPath());
+            name.setText(user.getName());
+            postUser.setText(user.getPost());
+        }catch (NullPointerException e){
+            Log.e("NULL", String.valueOf(e));
+        }
     }
 }

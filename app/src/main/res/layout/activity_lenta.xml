@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
@@ -24,16 +25,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/diss"
+                android:layout_marginBottom="20dp"
                 android:layout_marginTop="10dp"
+                android:layout_alignBottom="@id/video"
                 android:layout_marginLeft="15dp"/>
             <TextView
-                android:id="@+id/diss_text"
+                android:id="@+id/disstext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_toRightOf="@id/diss"
+                android:layout_alignLeft="@id/diss"
                 android:text="1К"
-                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginStart="5dp"
+                android:layout_alignBottom="@id/diss"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="25sp"/>
             <ImageView
@@ -41,17 +46,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/like"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:rotation="180"
+                android:layout_marginBottom="20dp"
+                android:layout_alignBottom="@id/video"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="15dp"/>
+                android:layout_marginEnd="15dp"/>
             <TextView
                 android:id="@+id/like_text"
-                android:layout_marginRight="5dp"
+                android:layout_marginEnd="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_toLeftOf="@id/like"
+                android:layout_toStartOf="@id/like"
+                android:layout_alignRight="@id/like"
+                android:layout_marginBottom="20dp"
+                android:layout_alignBottom="@id/like"
                 android:text="1К"
                 android:textColor="@color/colorAccent"
                 android:textSize="25sp"/>
@@ -170,3 +180,4 @@
             app:itemHorizontalTranslationEnabled="true"
             android:layout_alignParentBottom="true"/>
     </RelativeLayout>
+</layout>

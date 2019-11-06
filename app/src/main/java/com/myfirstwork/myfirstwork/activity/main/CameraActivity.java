@@ -1,6 +1,7 @@
 package com.myfirstwork.myfirstwork.activity.main;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.myfirstwork.myfirstwork.R;
@@ -19,4 +20,10 @@ public class CameraActivity extends Activity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this,LentaActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

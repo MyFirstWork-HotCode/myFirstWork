@@ -5,8 +5,8 @@ public class Video {
     private String path;
     private String name;
     private String info;
-    private int likes;
-    private int dislikes;
+    private int likes=0;
+    private int dislikes=0;
     private int user_id;
     private String child;
     private String dataTime;

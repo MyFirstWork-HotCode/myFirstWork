@@ -2,7 +2,6 @@ package com.myfirstwork.myfirstwork.activity.post;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,19 +16,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.myfirstwork.myfirstwork.R;
 import com.myfirstwork.myfirstwork.activity.main.LentaActivity;
 import com.myfirstwork.myfirstwork.activity.post.adapter.AdapterGallery;
@@ -38,8 +30,6 @@ import com.myfirstwork.myfirstwork.data.Query;
 import com.myfirstwork.myfirstwork.data.source.Tag;
 import com.myfirstwork.myfirstwork.data.source.Video;
 import com.myfirstwork.myfirstwork.databinding.ActivityPreviewVideoBinding;
-
-import org.joda.time.LocalDateTime;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,11 +54,12 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<String> textTags = new ArrayList<>();
     TextView textView, textInfo;
     Video video = new Video();
+    Bundle bundle;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityPreviewVideoBinding = DataBindingUtil.setContentView(this,R.layout.activity_preview_video);
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         storage = FirebaseStorage.getInstance();
         firestore = FirebaseFirestore.getInstance();
         displayMetrics=getResources().getDisplayMetrics();
@@ -182,48 +173,54 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 video.setChild("blog/");
                 break;
             case R.id.post:
-                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/").child(video.getChild())
-                        .child(file.getName());
-                UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(PreviewActivity.this, "Error in upload!(", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                        activityPreviewVideoBinding.progressBar.setVisibility(View.VISIBLE);
-                        int progress = (int) ((taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount())*100);
-                        activityPreviewVideoBinding.progressBar.setProgress(progress);
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                        video.setDislikes(0);
-                        video.setLikes(0);
-                        video.setName(file.getName());
-                        video.setInfo(textInfo.getText().toString());
-                        video.setPath(storageReference.getPath());
-                        video.setDataTime(LocalDateTime.now().getYear()+"."+LocalDateTime.now().getMonthOfYear()+
-                                LocalDateTime.now().getDayOfMonth()+'\n'+LocalDateTime.now().getHourOfDay()+":"+LocalDateTime.now().getMinuteOfHour());
-                        firestore.collection("videos").add(video).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
-                                startActivity(intent);
-                                finish();
-                                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(PreviewActivity.this, "Video database error!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
+                Query query = new Query(getApplicationContext());
+                query.insertVideo(String.valueOf(bundle.getString("video")),String.valueOf(textInfo.getText()),
+                        String.valueOf(textInfo.getText()));
+                Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
+                startActivity(intent);
+                finish();
+                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
+//                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/").child(file.getName());
+//                UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
+//                uploadTask.addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Toast.makeText(PreviewActivity.this, "Error in upload!(", Toast.LENGTH_SHORT).show();
+//                    }
+//                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+//                        activityPreviewVideoBinding.progressBar.setVisibility(View.VISIBLE);
+//                        int progress = (int) ((taskSnapshot.getBytesTransferred()/taskSnapshot.getTotalByteCount())*100);
+//                        activityPreviewVideoBinding.progressBar.setProgress(progress);
+//                    }
+//                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//
+//                        video.setDislikes(0);
+//                        video.setLikes(0);
+//                        video.setName(file.getName());
+//                        video.setInfo(textInfo.getText().toString());
+//                        video.setPath(storageReference.getPath());
+//                        video.setDataTime(LocalDateTime.now().getYear()+"."+LocalDateTime.now().getMonthOfYear()+
+//                                LocalDateTime.now().getDayOfMonth()+'\n'+LocalDateTime.now().getHourOfDay()+":"+LocalDateTime.now().getMinuteOfHour());
+//                        firestore.collection("videos").add(video).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                            @Override
+//                            public void onSuccess(DocumentReference documentReference) {
+//                                Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
+//                                startActivity(intent);
+//                                finish();
+//                                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Toast.makeText(PreviewActivity.this, "Video database error!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                    }
+//                });
 
                 break;
 

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static String DATABASENAME ="MFWDatabase";
-    public static int VERSION = 2;
+    public static int VERSION = 6;
 
     public static String ID="_id";
     //TAGS
@@ -21,6 +21,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static String VIDEO_LIKE="likes";
     public static String VIDEO_DISLIKE="dislike";
     public static String VIDEO_USERID="user_id";
+    public static String VIDEO_INFO="info";
 
     //USERS
     public static String TABLE_USERS="users";
@@ -48,20 +49,26 @@ public class DBHelper extends SQLiteOpenHelper {
                 VIDEO_NAME+" text not null, " +
                 VIDEO_LIKE+" integer default 0, " +
                 VIDEO_DISLIKE+" integer default 0, " +
-                VIDEO_USERID+" integer references " +
-                TABLE_USERS+" ( "+ID+" ) )");
+                VIDEO_INFO+" text, "+
+                VIDEO_USERID+" integer)");
         db.execSQL("create table "+TABLE_USERS+" (" +
+                ID+" integer not null primary key autoincrement unique, "+
                 USERS_NAME+" text not null, " +
                 USERS_OLD+" integer not null, " +
                 USERS_SEX+" text not null, " +
                 USERS_POST+" text )");
         DefaultData.createTagsName(db);
+        DefaultData.createUsersDefault(db);
+        DefaultData.createVideoDefault(db);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < newVersion) {
             db.execSQL("drop table if exists " + TABLE_TAGS);
+            db.execSQL("drop table if exists " + TABLE_USERS);
+            db.execSQL("drop table if exists " + TABLE_VIDEO);
             onCreate(db);
         }
     }
