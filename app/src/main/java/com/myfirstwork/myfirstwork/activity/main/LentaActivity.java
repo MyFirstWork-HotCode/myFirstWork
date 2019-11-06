@@ -3,6 +3,7 @@ package com.myfirstwork.myfirstwork.activity.main;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -60,7 +61,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     BottomNavigationView bottomNavigationView;
     ProgressBar progressBar;
     ImageView like,dislike,avatar;
-    private TextView textLike,textDiss,textInfoWork,date,name,postUser;
+    private TextView textLike,textDiss,textInfoWork,name,postUser;
     int height;
     Handler handler = new Handler();
     Animation animation, videoAnimation;
@@ -243,7 +244,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
 
         like=findViewById(R.id.like);
         avatar=findViewById(R.id.avatar_img);
-        date=findViewById(R.id.date);
+        //date=findViewById(R.id.date);
         name=findViewById(R.id.name);
         postUser=findViewById(R.id.post_user);
         textInfoWork=findViewById(R.id.info_work);
@@ -264,7 +265,6 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
 
     private void setVisibleGone(){
         avatar.setVisibility(View.GONE);
-        date.setVisibility(View.GONE);
         name.setVisibility(View.GONE);
         postUser.setVisibility(View.GONE);
         textLike.setVisibility(View.GONE);
@@ -276,7 +276,6 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
     private void setVisible(){
         progressBar.setVisibility(View.GONE);
         avatar.setVisibility(View.VISIBLE);
-        date.setVisibility(View.VISIBLE);
         name.setVisibility(View.VISIBLE);
         postUser.setVisibility(View.VISIBLE);
         textLike.setVisibility(View.VISIBLE);
@@ -397,7 +396,7 @@ public class LentaActivity extends AppCompatActivity implements Button.OnClickLi
             User user = query.getUserByPath(video.getPath());
             name.setText(user.getName());
             postUser.setText(user.getPost());
-        }catch (NullPointerException e){
+        }catch (CursorIndexOutOfBoundsException e){
             Log.e("NULL", String.valueOf(e));
         }
     }

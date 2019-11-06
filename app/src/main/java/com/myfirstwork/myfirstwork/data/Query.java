@@ -3,7 +3,9 @@ package com.myfirstwork.myfirstwork.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.myfirstwork.myfirstwork.data.source.Tag;
 import com.myfirstwork.myfirstwork.data.source.User;
@@ -100,10 +102,14 @@ public class Query {
                 "( SELECT "+DBHelper.VIDEO_USERID+" FROM "+DBHelper.TABLE_VIDEO+
                 " WHERE "+DBHelper.VIDEP_PATH+"= \""+path+"\")",null);
         cursor.moveToNext();
-        user.setName(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_NAME)));
-        user.setOld(cursor.getInt(cursor.getColumnIndex(DBHelper.USERS_OLD)));
-        user.setPost(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_POST)));
-        user.setSex(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_SEX)));
+        try {
+            user.setName(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_NAME)));
+            user.setOld(cursor.getInt(cursor.getColumnIndex(DBHelper.USERS_OLD)));
+            user.setPost(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_POST)));
+            user.setSex(cursor.getString(cursor.getColumnIndex(DBHelper.USERS_SEX)));
+        }catch (CursorIndexOutOfBoundsException e){
+            Log.e("LOG", String.valueOf(e));
+        }
         return user;
     }
 }
