@@ -1,18 +1,20 @@
 package com.myfirstwork.myfirstwork.data.source;
 
 public class User {
-    private int id;
+    private String id;
     private String name;
+    private String lastName;
+    private String dataBirth;
     private int old;
     private String sex;
     private String post;
     private String organizationId;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -54,5 +56,21 @@ public class User {
 
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getDataBirth() {
+        return dataBirth;
+    }
+
+    public void setDataBirth(String dataBirth) {
+        this.dataBirth = dataBirth;
     }
 }

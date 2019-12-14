@@ -43,6 +43,7 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
     private  File file;
     private FirebaseStorage storage;
     private FirebaseFirestore firestore;
+    private boolean flag=true;
     AdapterGallery adapterGallery;
     DisplayMetrics displayMetrics;
     RadioButton[] radioButtons = new RadioButton[3];
@@ -149,8 +150,13 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
         assert bundle != null;
-        file = new File(Objects.requireNonNull(bundle.getString("video")));
-        setVideoView(file.getAbsolutePath());
+        try {
+            file = new File(Objects.requireNonNull(bundle.getString("video")));
+            setVideoView(file.getAbsolutePath());
+        }catch (NullPointerException e){
+            Log.e("NULL", String.valueOf(e));
+            flag=false;
+        }
         activityPreviewVideoBinding.post.setOnClickListener(this);
     }
 
@@ -173,13 +179,20 @@ public class PreviewActivity extends AppCompatActivity implements View.OnClickLi
                 video.setChild("blog/");
                 break;
             case R.id.post:
+                if(flag){
                 Query query = new Query(getApplicationContext());
                 query.insertVideo(String.valueOf(bundle.getString("video")),String.valueOf(textInfo.getText()),
                         String.valueOf(textInfo.getText()));
                 Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
                 startActivity(intent);
                 finish();
-                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PreviewActivity.this, "Video upload!", Toast.LENGTH_SHORT).show();}
+                else {
+                    Intent intent = new Intent(PreviewActivity.this, LentaActivity.class);
+                    startActivity(intent);
+                    finish();
+                    Toast.makeText(PreviewActivity.this, "Video no upload!", Toast.LENGTH_SHORT).show();
+                }
 //                StorageReference storageReference = storage.getReferenceFromUrl("gs://myfirstwork-15e9c.appspot.com/").child(file.getName());
 //                UploadTask uploadTask = storageReference.putFile(Uri.fromFile(file));
 //                uploadTask.addOnFailureListener(new OnFailureListener() {

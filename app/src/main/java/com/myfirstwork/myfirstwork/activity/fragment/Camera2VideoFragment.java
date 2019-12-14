@@ -311,7 +311,15 @@ public class Camera2VideoFragment extends Fragment
                 if (mIsRecordingVideo) {
                     stopRecordingVideo();
                 } else {
-                    startRecordingVideo();
+                    try {
+                        startRecordingVideo();
+                    }catch (Exception e){
+                        Log.e("FATAL", String.valueOf(e));
+                        Intent intent = new Intent(getContext(), PreviewActivity.class);
+                        intent.putExtra("video",mNextVideoAbsolutePath);
+                        startActivity(intent);
+
+                    }
                 }
                 break;
             }
@@ -569,8 +577,8 @@ public class Camera2VideoFragment extends Fragment
         if (null == activity) {
             return;
         }
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
             mNextVideoAbsolutePath = getVideoFilePath();

@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DBHelper dbHelper = new DBHelper(this);
         dbHelper.close();
         go=findViewById(R.id.go);
+        Bundle bundle = getIntent().getExtras();
+        Toast.makeText(this, bundle.getString("token"), Toast.LENGTH_SHORT).show();
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);
         signIn=findViewById(R.id.sign_in);
